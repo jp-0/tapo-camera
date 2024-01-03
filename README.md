@@ -11,7 +11,7 @@ Have not yet looked to use later version and adjust how the SSL certificates are
 `poetry env use 3.8`
 
 ## Todo?
-- [ ] Implement additional logged methods
+- [ ] Implement additional logged methods (see `todo/implemented.py` for payload log)
 - [ ] Items marked TODO
 - [ ] Change to use JSONWizard
 - [ ] Clean everything up

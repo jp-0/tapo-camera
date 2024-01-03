@@ -217,6 +217,12 @@ class TapoCamera:
         )
         return result["responses"][0]["result"]["device_info"]
 
+    def get_last_alarm_info(self):
+        result = self._multi_request(
+            "getLastAlarmInfo", {"system": {"name": ["last_alarm_info"]}}, True
+        )
+        return result["responses"][0]["result"]['system']
+
     def get_device_alias(self):
         return self.get_device_info()["basic_info"]["device_alias"]
 
@@ -251,6 +257,7 @@ class TapoCamera:
         return result["responses"][0]["result"]
 
     def get_alert_config(self):
+        # TODO multiple channels
         result = self._multi_request(
             "getAlertConfig", {"msg_alarm": {"name": ["chn1_msg_alarm_info"]}}, True
         )
@@ -628,6 +635,46 @@ class TapoCamera:
             if result["responses"][0]["error_code"] == 0
             else RequestFailure()
         )
+
+    def get_detection_config(self):
+        result = self._multi_request(
+            "getDetectionConfig", {"motion_detection": {"name": ["motion_det"], "table": ["region_info"]}}, True
+        )
+        return result["responses"][0]["result"]
+
+    def set_motion_detection_sensitivity(self, setting: str):
+        # TODO improve approach rather 'special strings'
+        if setting == 'high':
+            level = 80
+        elif setting == 'medium':
+            level = 50
+        elif setting == 'low':
+            level = 20
+        else:
+            raise ValueError('Error setting motion sensitivity, unknown level')
+        result = self._multi_request(
+            "setDetectionConfig", {"motion_detection": {"motion_det": {"digital_sensitivity": str(level)}}}, True
+        )
+        return result["responses"][0]["result"]
+
+    def set_motion_detection(self, on: bool):
+        enabled = "on" if on else "off"
+        result = self._multi_request(
+            "setDetectionConfig", {"motion_detection": {"motion_det": {"enabled": enabled}}}, True
+        )
+        return result["responses"][0]["result"]
+
+    def get_msg_push_config(self):
+        result = self._multi_request(
+            "getMsgPushConfig", {"msg_push": {"name": ["chn1_msg_push_info"]}}, True
+        )
+        return result["responses"][0]["result"]
+
+    def get_person_detection_config(self):
+        result = self._multi_request(
+            "getPersonDetectionConfig", {"people_detection": {"name": ["detection"]}}, True
+        )
+        return result["responses"][0]["result"]
 
     def _get_md5(self, text):
         return hashlib.md5(text.encode()).hexdigest().upper()
